@@ -10,15 +10,26 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func getSocket(ip, port, appName, token string) (*websocket.Conn, error) {
-	wsUrl := fmt.Sprintf(
-		"wss://%s:%s/api/v2/channels/samsung.remote.control?name=%s",
-		ip, port, appName,
-	)
-	if token != "" {
-		wsUrl += "&token=" + token
+type socket struct {
+	ip         string
+	port       string
+	appName    string
+	token      string
+	connection *websocket.Conn
+}
+
+func (s *socket) connect() error {
+	if s.connection != nil {
+		return nil
 	}
 
+	wsUrl := fmt.Sprintf(
+		"wss://%s:%s/api/v2/channels/samsung.remote.control?name=%s",
+		s.ip, s.port, s.appName,
+	)
+	if s.token != "" {
+		wsUrl += "&token=" + s.token
+	}
 	dialer := websocket.Dialer{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
@@ -27,14 +38,17 @@ func getSocket(ip, port, appName, token string) (*websocket.Conn, error) {
 
 	conn, _, err := dialer.Dial(wsUrl, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
+
+	connChn := make(chan error, 1)
 
 	go func() {
 		for {
 			_, data, err := conn.ReadMessage()
 			if err != nil {
-				log.Fatal(err)
+				connChn <- err
+				return
 			}
 
 			var msg struct {
@@ -44,21 +58,42 @@ func getSocket(ip, port, appName, token string) (*websocket.Conn, error) {
 				Event string `json:"event"`
 			}
 			if err := json.Unmarshal(data, &msg); err != nil {
-				log.Fatal(err)
+				connChn <- err
+				return
 			}
 
 			if msg.Event == "ms.channel.connect" {
 				fmt.Println("Connected to TV")
-				if token != "" {
-					continue
-				}
-				err = os.WriteFile(TOKEN_FILE, []byte(msg.Data.Token), 0644)
-				if err != nil {
-					log.Fatal(err)
+				if s.token == "" {
+					respToken := msg.Data.Token
+					s.token = respToken
+					err = os.WriteFile(TOKEN_FILE, []byte(respToken), 0644)
+					if err != nil {
+						connChn <- fmt.Errorf("error: could not write token to file: %w", err)
+						continue
+					}
+					connChn <- nil
+					return
 				}
 			}
 		}
 	}()
 
-	return conn, nil
+	err = <-connChn
+	if err != nil {
+		conn.Close()
+		return fmt.Errorf("could not connect to tv: %w", err)
+	}
+
+	s.connection = conn
+	return nil
+}
+
+func (s *socket) close() {
+	if s.connection != nil {
+		err := s.connection.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}
 }

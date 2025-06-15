@@ -5,13 +5,11 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-
-	"github.com/gorilla/websocket"
 )
 
 type api struct {
-	ws *websocket.Conn
-	pw string
+	socket *socket
+	pw     string
 }
 
 func getChange(r *http.Request) (int, error) {
@@ -27,6 +25,9 @@ func getChange(r *http.Request) (int, error) {
 }
 
 func (a *api) checkAuth(w http.ResponseWriter, r *http.Request) bool {
+	if a.pw == "" {
+		return true
+	}
 	auth := r.Header.Get("Authorization")
 	if auth == "" {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -39,6 +40,10 @@ func (a *api) checkAuth(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func (a *api) increaseBrightness(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
 	if ok := a.checkAuth(w, r); !ok {
 		return
 	}
@@ -47,7 +52,7 @@ func (a *api) increaseBrightness(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	err = changeBrightness(a.ws, change, KEY_RIGHT)
+	err = changeBrightness(a.socket, change, KEY_RIGHT)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -56,6 +61,10 @@ func (a *api) increaseBrightness(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *api) decreaseBrightness(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
 	if ok := a.checkAuth(w, r); !ok {
 		return
 	}
@@ -64,7 +73,7 @@ func (a *api) decreaseBrightness(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	err = changeBrightness(a.ws, change, KEY_LEFT)
+	err = changeBrightness(a.socket, change, KEY_LEFT)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {

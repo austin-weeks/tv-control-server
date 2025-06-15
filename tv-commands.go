@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -40,15 +41,15 @@ func openBrightness(conn *websocket.Conn) error {
 	macros := []macro{
 		{
 			key:   KEY_MORE,
-			delay: 1500 * time.Millisecond,
+			delay: 2000 * time.Millisecond,
 		},
 		{
 			key:   KEY_ENTER,
-			delay: 600 * time.Millisecond,
+			delay: 1000 * time.Millisecond,
 		},
 		{
 			key:   KEY_ENTER,
-			delay: 600 * time.Millisecond,
+			delay: 1000 * time.Millisecond,
 		},
 	}
 	err := performMacro(conn, macros)
@@ -59,33 +60,45 @@ func closeBrightness(conn *websocket.Conn) error {
 	macros := []macro{
 		{
 			key:   KEY_RETURN,
-			delay: 900 * time.Millisecond,
+			delay: 1000 * time.Millisecond,
 		},
 		{
 			key:   KEY_RETURN,
-			delay: 900 * time.Millisecond,
+			delay: 1000 * time.Millisecond,
 		},
 		{
 			key:   KEY_RETURN,
-			delay: 900 * time.Millisecond,
+			delay: 1000 * time.Millisecond,
 		},
 	}
 	err := performMacro(conn, macros)
 	return err
 }
 
-func changeBrightness(conn *websocket.Conn, change int, key string) error {
-	err := openBrightness(conn)
+func changeBrightness(socket *socket, change int, key string) error {
+	if change <= 0 {
+		return fmt.Errorf("adjustment value is less than or equal to zero")
+	}
+
+	err := socket.connect()
+	if err != nil {
+		return err
+	}
+
+	err = openBrightness(socket.connection)
 	if err != nil {
 		return err
 	}
 	for i := 0; i < change; i++ {
-		err := sendKey(conn, key)
+		err := sendKey(socket.connection, key)
 		if err != nil {
 			return err
 		}
-		time.Sleep(300 * time.Millisecond)
+		time.Sleep(450 * time.Millisecond)
 	}
-	err = closeBrightness(conn)
-	return err
+	err = closeBrightness(socket.connection)
+	if err != nil {
+		return err
+	}
+	return nil
 }
