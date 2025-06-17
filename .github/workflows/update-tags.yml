@@ -1,0 +1,46 @@
+name: Update Tags
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Update-Tags:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install AutoGitSemVer
+        run: uv add AutoGitSemVer
+
+      - name: Update Package & Action Major/Minor/Patch Tags
+        run: |
+          tag=$(uv run autogitsemver . --no-branch-name --no-metadata --quiet)
+          if [[ ! "$tag" =~ ^([^0-9]*)([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+              echo "Invalid semantic version tag: $tag" >&2
+              exit 1
+          fi
+          prefix="${BASH_REMATCH[1]}"
+          major="${BASH_REMATCH[2]}"
+          minor="${BASH_REMATCH[3]}"
+          patch="${BASH_REMATCH[4]}"
+
+          # create new tags
+          major_tag="${prefix}${major}"
+          minor_tag="${prefix}${major}.${minor}"
+          patch_tag="${prefix}${major}.${minor}.${patch}"
+
+          # apply tags
+          git tag "$major_tag" -f
+          git tag "$minor_tag" -f
+          git tag "$patch_tag" # shouldn't have to force, if we do, something has gone wrong
+
+          # push tags
+          git push --tags --force
