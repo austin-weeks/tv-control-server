@@ -3,7 +3,13 @@ name: Build & Release
 on:
   workflow_call:
     inputs:
-      tag:
+      major_tag:
+        required: true
+        type: string
+      minor_tag:
+        required: true
+        type: string
+      patch_tag:
         required: true
         type: string
 
@@ -26,6 +32,8 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.patch_tag }}
 
     - name: Setup Go
       uses: actions/setup-go@v5
@@ -50,10 +58,29 @@ jobs:
         with:
           path: dist
 
-      - name: Publish Releases
+      - name: Publish Release (Major)
         uses: softprops/action-gh-release@v2
         with:
           files: dist/**/*
-          tag_name: ${{ inputs.tag }}
+          tag_name: ${{ inputs.major_tag }}
+          make_latest: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Release (Minor)
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*
+          tag_name: ${{ inputs.minor_tag }}
+          make_latest: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Release (Patch)
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*
+          tag_name: ${{ inputs.patch_tag }}
+          make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
