@@ -58,20 +58,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  Build-Release-Major:
+  Build-Release:
     needs: Update-Tags
     uses: ./.github/workflows/build-release.yml
     with:
-      tag: ${{ needs.Update-Tags.outputs.major_tag }}
-
-  Build-Release-Minor:
-    needs: Update-Tags
-    uses: ./.github/workflows/build-release.yml
-    with:
-      tag: ${{ needs.Update-Tags.outputs.minor_tag }}
-
-  Build-Release-Patch:
-    needs: Update-Tags
-    uses: ./.github/workflows/build-release.yml
-    with:
-      tag: ${{ needs.Update-Tags.outputs.patch_tag }}
+      major_tag: ${{ needs.Update-Tags.outputs.major_tag }}
+      minor_tag: ${{ needs.Update-Tags.outputs.minor_tag }}
+      patch_tag: ${{ needs.Update-Tags.outputs.patch_tag }}
