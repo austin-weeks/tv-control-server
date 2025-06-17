@@ -11,6 +11,8 @@ on:
 jobs:
   Run-Checks:
     runs-on: ubuntu-latest
+    env:
+      REQUIRED_COVERAGE: 0
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
@@ -22,4 +24,10 @@ jobs:
       run: test -z "$(go fmt .)"
     
     - name: Run Tests
-      run: go test ./...
+      run: go test -coverprofile=coverage.out ./...
+
+    - name: Check Test Coverage
+      run: |
+        coverage=$(go tool cover -func=coverage.out | grep total: | awk '{print substr($3, 1, length($3)-1)}')
+        echo "Total coverage: $coverage%"
+        awk -v cov="$coverage" -v th=${{ env.REQUIRED_COVERAGE }} 'BEGIN { if (cov < th) { exit 1 } }'
