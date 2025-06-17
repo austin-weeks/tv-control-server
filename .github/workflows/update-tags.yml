@@ -11,6 +11,10 @@ permissions:
 jobs:
   Update-Tags:
     runs-on: ubuntu-latest
+    outputs:
+      major_tag: ${{ steps.update_tags.outputs.major_tag }}
+      minor_tag: ${{ steps.update_tags.outputs.minor_tag }}
+      patch_tag: ${{ steps.update_tags.outputs.patch_tag }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -46,5 +50,28 @@ jobs:
 
           # push tags
           git push --tags --force
+
+          # set outputs for tags
+          echo "major_tag=$major_tag" >> $GITHUB_OUTPUT
+          echo "minor_tag=$minor_tag" >> $GITHUB_OUTPUT
+          echo "patch_tag=$patch_tag" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  Build-Release-Major:
+    needs: Update-Tags
+    uses: ./.github/workflows/build-release.yml
+    with:
+      tag: ${{ needs.Update-Tags.outputs.major_tag }}
+
+  Build-Release-Minor:
+    needs: Update-Tags
+    uses: ./.github/workflows/build-release.yml
+    with:
+      tag: ${{ needs.Update-Tags.outputs.minor_tag }}
+
+  Build-Release-Patch:
+    needs: Update-Tags
+    uses: ./.github/workflows/build-release.yml
+    with:
+      tag: ${{ needs.Update-Tags.outputs.patch_tag }}
