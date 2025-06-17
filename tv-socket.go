@@ -75,6 +75,8 @@ func (s *socket) connect() error {
 					connChn <- nil
 					return
 				}
+				connChn <- nil
+				return
 			}
 		}
 	}()

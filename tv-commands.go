@@ -60,15 +60,15 @@ func closeBrightness(conn *websocket.Conn) error {
 	macros := []macro{
 		{
 			key:   KEY_RETURN,
-			delay: 1000 * time.Millisecond,
+			delay: 1300 * time.Millisecond,
 		},
 		{
 			key:   KEY_RETURN,
-			delay: 1000 * time.Millisecond,
+			delay: 1300 * time.Millisecond,
 		},
 		{
 			key:   KEY_RETURN,
-			delay: 1000 * time.Millisecond,
+			delay: 1300 * time.Millisecond,
 		},
 	}
 	err := performMacro(conn, macros)
