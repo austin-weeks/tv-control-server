@@ -21,6 +21,7 @@ jobs:
         uses: astral-sh/setup-uv@v6
 
       - name: Update Package & Action Major/Minor/Patch Tags
+        id: update_tags
         run: |
           tag=$(uv run --with AutoGitSemVer python -m AutoGitSemVer.EntryPoint . --no-branch-name --no-metadata --quiet)
           echo $tag
@@ -41,10 +42,9 @@ jobs:
           # apply tags
           git tag "$major_tag" -f
           git tag "$minor_tag" -f
-          git tag "$patch_tag" # shouldn't have to force, if we do, something has gone wrong
+          git tag "$patch_tag" -f 
 
           # push tags
           git push --tags --force
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN}}
- 
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,9 +1,9 @@
-name: CD
+name: Build & Release
 
 on:
   push:
     tags:
-      - '^v\d+\.\d+\.\d+$'
+      - 'v*'
 
 permissions:
   contents: write
@@ -54,4 +54,3 @@ jobs:
           files: dist/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
