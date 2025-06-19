@@ -6,13 +6,24 @@ import (
 	"net"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
 
 const TEST_IP = "127.0.0.1"
 const TEST_PORT = "12345"
+const TEST_TOKEN = "test-token"
+
+func getTestSocket() (socket, error) {
+	socket := socket{
+		ip:      TEST_IP,
+		port:    TEST_PORT,
+		testing: true,
+		token:   TEST_TOKEN,
+	}
+	err := socket.connect()
+	return socket, err
+}
 
 func startTestWSServer(t *testing.T, token string) func() {
 	upgrader := websocket.Upgrader{}
@@ -37,8 +48,14 @@ func startTestWSServer(t *testing.T, token string) func() {
 				t.Fatal(err)
 			}
 			conn.WriteMessage(websocket.TextMessage, b)
-			// Wait a bit to keep connection open
-			time.Sleep(100 * time.Millisecond)
+
+			// Read messages to allow for testing
+			for {
+				_, _, err := conn.ReadMessage()
+				if err != nil {
+					break
+				}
+			}
 		},
 	)
 
