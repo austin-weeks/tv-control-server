@@ -1,0 +1,8 @@
+#!/bin/bash
+
+go test ./... -coverprofile=coverage.out
+if [[ "$1" == "--detailed" || "$1" == "-d" ]]; then
+    go tool cover -html=coverage.out
+else
+    go tool cover -func=coverage.out
+fi
