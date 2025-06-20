@@ -25,7 +25,7 @@ func getTestSocket() (socket, error) {
 	return socket, err
 }
 
-func startTestWSServer(t *testing.T, token string) func() {
+func startTestWSServer(t *testing.T, token string, expectedMacros []macro) func() {
 	upgrader := websocket.Upgrader{}
 	server := http.Server{}
 
@@ -49,12 +49,27 @@ func startTestWSServer(t *testing.T, token string) func() {
 			}
 			conn.WriteMessage(websocket.TextMessage, b)
 
-			// Read messages to allow for testing
+			// Check Sent Keys
+			keyInd := 0
 			for {
-				_, _, err := conn.ReadMessage()
+				_, msgBytes, err := conn.ReadMessage()
 				if err != nil {
-					break
+					t.Error("Error reading client message:", err)
 				}
+				if expectedMacros == nil {
+					continue
+				}
+				var msg keyMsg
+				err = json.Unmarshal(msgBytes, &msg)
+				if err != nil {
+					t.Error("Could not deserialize client message:", err)
+				}
+				sentKey := msg.Params.DataOfCmd
+				expectedKey := expectedMacros[keyInd].key
+				if sentKey != expectedKey {
+					t.Fatalf("Sent key %s does not match expected %s", sentKey, expectedKey)
+				}
+				keyInd++
 			}
 		},
 	)

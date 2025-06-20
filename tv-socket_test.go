@@ -10,7 +10,7 @@ import (
 func TestConnect(t *testing.T) {
 	t.Run("Exercise Happy Path", func(t *testing.T) {
 		token := "test-token"
-		close := startTestWSServer(t, token)
+		close := startTestWSServer(t, token, nil)
 		defer close()
 		socket := socket{
 			ip:      TEST_IP,
@@ -27,7 +27,7 @@ func TestConnect(t *testing.T) {
 	for _, testToken := range []string{"", "invalid-token"} {
 		t.Run("Token is written to file "+testToken, func(t *testing.T) {
 			correctToken := "test-token"
-			close := startTestWSServer(t, correctToken)
+			close := startTestWSServer(t, correctToken, nil)
 			defer close()
 			tmpFile := t.TempDir() + ".tv_token"
 			socket := socket{
@@ -67,7 +67,7 @@ func TestConnect(t *testing.T) {
 	})
 
 	t.Run("Socket returns err on failed connection", func(t *testing.T) {
-		close := startTestWSServer(t, "test-token")
+		close := startTestWSServer(t, "test-token", nil)
 		defer close()
 		socket := socket{
 			ip:      "bad ip",
@@ -86,7 +86,7 @@ func TestConnect(t *testing.T) {
 
 func TestClose(t *testing.T) {
 	t.Run("Socket closes connection", func(t *testing.T) {
-		close := startTestWSServer(t, "test-token")
+		close := startTestWSServer(t, "test-token", nil)
 		defer close()
 		socket := socket{
 			ip:      TEST_IP,

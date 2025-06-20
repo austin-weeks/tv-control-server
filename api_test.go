@@ -44,8 +44,8 @@ func TestGetChange(t *testing.T) {
 		expected int
 	}{
 		{"1", 1},
-		{"23", 23},
-		{"50", 50},
+		{"3", 3},
+		{"5", 5},
 	} {
 		t.Run("Extracts valid adjustment value", func(t *testing.T) {
 			req := httptest.NewRequest("", DUMMY_URL, nil)
@@ -131,7 +131,7 @@ func TestCheckAuth(t *testing.T) {
 }
 
 func TestBrightnessHandlers(t *testing.T) {
-	close := startTestWSServer(t, "")
+	close := startTestWSServer(t, "", nil)
 	defer close()
 	socket, err := getTestSocket()
 	if err != nil {
