@@ -30,12 +30,15 @@ func startTestWSServer(t *testing.T, token string, expectedMacros []macro) func(
 
 	mux := http.NewServeMux()
 	server.Handler = mux
+
+	errCh := make(chan error, 1)
 	mux.HandleFunc(
 		"/api/v2/channels/samsung.remote.control",
 		func(w http.ResponseWriter, r *http.Request) {
 			conn, err := upgrader.Upgrade(w, r, nil)
 			if err != nil {
-				t.Fatal(err)
+				errCh <- err
+				return
 			}
 			defer conn.Close()
 			msg := tvResponse{
@@ -44,16 +47,22 @@ func startTestWSServer(t *testing.T, token string, expectedMacros []macro) func(
 			}
 			b, err := json.Marshal(msg)
 			if err != nil {
-				t.Fatal(err)
+				errCh <- err
+				return
 			}
-			conn.WriteMessage(websocket.TextMessage, b)
+			err = conn.WriteMessage(websocket.TextMessage, b)
+			if err != nil {
+				errCh <- err
+				return
+			}
 
 			// Check Sent Keys
 			keyInd := 0
 			for {
 				_, msgBytes, err := conn.ReadMessage()
 				if err != nil {
-					t.Error("Error reading client message:", err)
+					errCh <- fmt.Errorf("error reading client message: %w", err)
+					return
 				}
 				if expectedMacros == nil {
 					continue
@@ -61,12 +70,14 @@ func startTestWSServer(t *testing.T, token string, expectedMacros []macro) func(
 				var msg keyMsg
 				err = json.Unmarshal(msgBytes, &msg)
 				if err != nil {
-					t.Error("Could not deserialize client message:", err)
+					errCh <- fmt.Errorf("could not deserialize client message: %w", err)
+					return
 				}
 				sentKey := msg.Params.DataOfCmd
 				expectedKey := expectedMacros[keyInd].key
 				if sentKey != expectedKey {
-					t.Fatalf("Sent key %s does not match expected %s", sentKey, expectedKey)
+					errCh <- fmt.Errorf("sent key %s does not match expected %s", sentKey, expectedKey)
+					return
 				}
 				keyInd++
 			}
@@ -80,12 +91,19 @@ func startTestWSServer(t *testing.T, token string, expectedMacros []macro) func(
 	go func() {
 		err := server.Serve(ln)
 		if err != nil && err != http.ErrServerClosed {
-			t.Error("Test server failed to serve", err)
+			errCh <- fmt.Errorf("test server failed to serve: %w", err)
 		}
 	}()
 
 	return func() {
 		server.Close()
 		ln.Close()
+		select {
+		case err := <-errCh:
+			if err != nil {
+				t.Error("Test server error:", err)
+			}
+		default:
+		}
 	}
 }
