@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -12,14 +11,55 @@ type macro struct {
 	delay time.Duration
 }
 
+type keyMsg struct {
+	Method string       `json:"method"`
+	Params keyMsgParams `json:"params"`
+}
+type keyMsgParams struct {
+	Cmd          string `json:"Cmd"`
+	DataOfCmd    string `json:"DataOfCmd"`
+	Option       bool   `json:"Option"`
+	TypeOfRemote string `json:"TypeOfRemote"`
+}
+
+var OPEN_MACRO = []macro{
+	{
+		key:   KEY_MORE,
+		delay: 2000 * time.Millisecond,
+	},
+	{
+		key:   KEY_ENTER,
+		delay: 1000 * time.Millisecond,
+	},
+	{
+		key:   KEY_ENTER,
+		delay: 1000 * time.Millisecond,
+	},
+}
+
+var CLOSE_MACRO = []macro{
+	{
+		key:   KEY_RETURN,
+		delay: 1300 * time.Millisecond,
+	},
+	{
+		key:   KEY_RETURN,
+		delay: 1300 * time.Millisecond,
+	},
+	{
+		key:   KEY_RETURN,
+		delay: 1300 * time.Millisecond,
+	},
+}
+
 func sendKey(conn *websocket.Conn, key string) error {
-	msg := map[string]any{
-		"method": "ms.remote.control",
-		"params": map[string]any{
-			"Cmd":          "Click",
-			"DataOfCmd":    key,
-			"Option":       "false",
-			"TypeOfRemote": "SendRemoteKey",
+	msg := keyMsg{
+		Method: "ms.remote.control",
+		Params: keyMsgParams{
+			Cmd:          "Click",
+			DataOfCmd:    key,
+			Option:       false,
+			TypeOfRemote: "SendRemoteKey",
 		},
 	}
 	err := conn.WriteJSON(msg)
@@ -32,71 +72,37 @@ func performMacro(conn *websocket.Conn, macros []macro) error {
 		if err != nil {
 			return err
 		}
-		time.Sleep(macro.delay)
+		delay := macro.delay
+		if isTesting {
+			delay = 1 * time.Millisecond
+		}
+		time.Sleep(delay)
 	}
 	return nil
 }
 
-func openBrightness(conn *websocket.Conn) error {
-	macros := []macro{
-		{
-			key:   KEY_MORE,
-			delay: 2000 * time.Millisecond,
-		},
-		{
-			key:   KEY_ENTER,
-			delay: 1000 * time.Millisecond,
-		},
-		{
-			key:   KEY_ENTER,
-			delay: 1000 * time.Millisecond,
-		},
-	}
-	err := performMacro(conn, macros)
-	return err
-}
-
-func closeBrightness(conn *websocket.Conn) error {
-	macros := []macro{
-		{
-			key:   KEY_RETURN,
-			delay: 1300 * time.Millisecond,
-		},
-		{
-			key:   KEY_RETURN,
-			delay: 1300 * time.Millisecond,
-		},
-		{
-			key:   KEY_RETURN,
-			delay: 1300 * time.Millisecond,
-		},
-	}
-	err := performMacro(conn, macros)
-	return err
-}
-
 func changeBrightness(socket *socket, change int, key string) error {
-	if change <= 0 {
-		return fmt.Errorf("adjustment value is less than or equal to zero")
-	}
-
 	err := socket.connect()
 	if err != nil {
 		return err
 	}
 
-	err = openBrightness(socket.connection)
+	err = performMacro(socket.connection, OPEN_MACRO)
 	if err != nil {
 		return err
 	}
+	changeMacros := []macro{}
 	for i := 0; i < change; i++ {
-		err := sendKey(socket.connection, key)
-		if err != nil {
-			return err
-		}
-		time.Sleep(450 * time.Millisecond)
+		changeMacros = append(changeMacros, macro{
+			key:   key,
+			delay: 450 * time.Millisecond,
+		})
 	}
-	err = closeBrightness(socket.connection)
+	err = performMacro(socket.connection, changeMacros)
+	if err != nil {
+		return err
+	}
+	err = performMacro(socket.connection, CLOSE_MACRO)
 	if err != nil {
 		return err
 	}

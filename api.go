@@ -12,6 +12,8 @@ type api struct {
 	pw     string
 }
 
+const MAX_CHANGE = 50
+
 func getChange(r *http.Request) (int, error) {
 	adj := r.Header.Get("Adjustment")
 	if adj == "" {
@@ -20,6 +22,9 @@ func getChange(r *http.Request) (int, error) {
 	change, err := strconv.Atoi(strings.TrimSpace(adj))
 	if err != nil {
 		return 0, err
+	}
+	if change <= 0 || change > 50 {
+		return 0, fmt.Errorf("adjusment value is not in range 1 to 50")
 	}
 	return change, nil
 }
@@ -40,10 +45,6 @@ func (a *api) checkAuth(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func (a *api) increaseBrightness(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
 	if ok := a.checkAuth(w, r); !ok {
 		return
 	}
@@ -61,10 +62,6 @@ func (a *api) increaseBrightness(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *api) decreaseBrightness(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
 	if ok := a.checkAuth(w, r); !ok {
 		return
 	}
