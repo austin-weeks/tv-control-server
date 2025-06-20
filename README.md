@@ -19,6 +19,7 @@ CLIENT_PW="password" # an optional password to authenticate with your server
 ### Endpoints
 
 `GET /increase-brightness` - Increase the brightness of your TV
+
 `GET /decrease-brightness` - Decrease the brightness of your TV
 
 Both endpoints require the following **headers**:
