@@ -24,7 +24,6 @@ type socket struct {
 	appName    string
 	token      string
 	connection *websocket.Conn
-	testing    bool
 	tokenFile  string
 }
 
@@ -36,7 +35,7 @@ func (s *socket) connect() error {
 	}
 
 	protocol := "wss"
-	if s.testing {
+	if isTesting {
 		protocol = "ws"
 	}
 	wsUrl := fmt.Sprintf(

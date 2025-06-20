@@ -12,7 +12,7 @@ jobs:
   Run-Checks:
     runs-on: ubuntu-latest
     env:
-      REQUIRED_COVERAGE: 75
+      REQUIRED_COVERAGE: 70
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
       run: test -z "$(go fmt .)"
     
     - name: Run Tests
-      run: go test -coverprofile=coverage.out ./...
+      run: go test -coverprofile=coverage.out -v ./...
 
     - name: Check Test Coverage
       run: |

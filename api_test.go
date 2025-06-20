@@ -114,10 +114,10 @@ func TestCheckAuth(t *testing.T) {
 
 	t.Run("Fails with incorrect password", func(t *testing.T) {
 		api := api{
-			pw: "password124",
+			pw: "password123",
 		}
 		req := httptest.NewRequest("", DUMMY_URL, nil)
-		req.Header.Set("Authorization", "invalid-password")
+		req.Header.Set("Authorization", "incorrect-password")
 		w := httptest.NewRecorder()
 
 		res := api.checkAuth(w, req)

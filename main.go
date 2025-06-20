@@ -17,6 +17,8 @@ const (
 	APP_PORT   = ":1234"
 )
 
+var isTesting bool
+
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {

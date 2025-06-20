@@ -72,19 +72,13 @@ func performMacro(conn *websocket.Conn, macros []macro) error {
 		if err != nil {
 			return err
 		}
-		time.Sleep(macro.delay)
+		delay := macro.delay
+		if isTesting {
+			delay = 1 * time.Millisecond
+		}
+		time.Sleep(delay)
 	}
 	return nil
-}
-
-func openBrightness(conn *websocket.Conn) error {
-	err := performMacro(conn, OPEN_MACRO)
-	return err
-}
-
-func closeBrightness(conn *websocket.Conn) error {
-	err := performMacro(conn, CLOSE_MACRO)
-	return err
 }
 
 func changeBrightness(socket *socket, change int, key string) error {
@@ -93,18 +87,22 @@ func changeBrightness(socket *socket, change int, key string) error {
 		return err
 	}
 
-	err = openBrightness(socket.connection)
+	err = performMacro(socket.connection, OPEN_MACRO)
 	if err != nil {
 		return err
 	}
+	changeMacros := []macro{}
 	for i := 0; i < change; i++ {
-		err := sendKey(socket.connection, key)
-		if err != nil {
-			return err
-		}
-		time.Sleep(450 * time.Millisecond)
+		changeMacros = append(changeMacros, macro{
+			key:   key,
+			delay: 450 * time.Millisecond,
+		})
 	}
-	err = closeBrightness(socket.connection)
+	err = performMacro(socket.connection, changeMacros)
+	if err != nil {
+		return err
+	}
+	err = performMacro(socket.connection, CLOSE_MACRO)
 	if err != nil {
 		return err
 	}

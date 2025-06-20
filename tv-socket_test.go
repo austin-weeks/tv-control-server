@@ -13,10 +13,9 @@ func TestConnect(t *testing.T) {
 		close := startTestWSServer(t, token, nil)
 		defer close()
 		socket := socket{
-			ip:      TEST_IP,
-			port:    TEST_PORT,
-			testing: true,
-			token:   token,
+			ip:    TEST_IP,
+			port:  TEST_PORT,
+			token: token,
 		}
 		err := socket.connect()
 		if err != nil {
@@ -33,7 +32,6 @@ func TestConnect(t *testing.T) {
 			socket := socket{
 				ip:        TEST_IP,
 				port:      TEST_PORT,
-				testing:   true,
 				token:     testToken,
 				tokenFile: tmpFile,
 			}
@@ -70,9 +68,8 @@ func TestConnect(t *testing.T) {
 		close := startTestWSServer(t, "test-token", nil)
 		defer close()
 		socket := socket{
-			ip:      "bad ip",
-			port:    "bad port",
-			testing: true,
+			ip:   "bad ip",
+			port: "bad port",
 		}
 		err := socket.connect()
 		if err == nil {
@@ -89,10 +86,9 @@ func TestClose(t *testing.T) {
 		close := startTestWSServer(t, "test-token", nil)
 		defer close()
 		socket := socket{
-			ip:      TEST_IP,
-			port:    TEST_PORT,
-			testing: true,
-			token:   "test-token",
+			ip:    TEST_IP,
+			port:  TEST_PORT,
+			token: "test-token",
 		}
 		err := socket.connect()
 		if err != nil {

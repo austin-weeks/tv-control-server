@@ -16,10 +16,9 @@ const TEST_TOKEN = "test-token"
 
 func getTestSocket() (socket, error) {
 	socket := socket{
-		ip:      TEST_IP,
-		port:    TEST_PORT,
-		testing: true,
-		token:   TEST_TOKEN,
+		ip:    TEST_IP,
+		port:  TEST_PORT,
+		token: TEST_TOKEN,
 	}
 	err := socket.connect()
 	return socket, err
