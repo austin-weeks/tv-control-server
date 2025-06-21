@@ -41,8 +41,6 @@ App settings must be provided in a `config.json` file.
 
 `GET /decrease-brightness` - Decrease the brightness of your TV
 
-Both endpoints require the following **headers**:
-- `"Authorization: <password>"` - client password as set in `.env`
+#### Headers
+- `"Authorization: <password>"` - client password if set in `config.json`
 - `"Adjustment: <value>"` - number by which to increase/decrease TV brightness
-
-The server will listen on port `1234`. HTTPS is currently **not** supported.
