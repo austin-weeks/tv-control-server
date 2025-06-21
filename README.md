@@ -1,4 +1,5 @@
-[![CI](https://github.com/austin-weeks/tv-control-server/actions/workflows/CI.yml/badge.svg)](https://github.com/austin-weeks/tv-control-server/actions/workflows/CI.yml)
+[![Tests](https://github.com/austin-weeks/tv-control-server/actions/workflows/Tests.yml/badge.svg)](https://github.com/austin-weeks/tv-control-server/actions/workflows/Tests.yml)
+[![CD](https://github.com/austin-weeks/tv-control-server/actions/workflows/CD.yml/badge.svg)](https://github.com/austin-weeks/tv-control-server/actions/workflows/CD.yml)
 
 # 📺 Samsung TV Control Server
 A server that provides endpoints for controlling your Samsung TV without needing to reach for your remote. Currently, endpoints for increasing and decreasing brightness are provided.
