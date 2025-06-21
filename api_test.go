@@ -200,3 +200,30 @@ func TestBrightnessHandlers(t *testing.T) {
 		}
 	})
 }
+
+func TestHandlersNoConnection(t *testing.T) {
+	t.Run("Endpoints handler failed connection", func(t *testing.T) {
+		for i := 0; i < 2; i++ {
+			socket := socket{
+				ip:   TEST_IP,
+				port: TEST_PORT,
+			}
+			api := api{
+				pw:     "password123",
+				socket: &socket,
+			}
+			req := httptest.NewRequest("", DUMMY_URL, nil)
+			req.Header.Set("Authorization", "password123")
+			req.Header.Set("Adjustment", "5")
+			w := httptest.NewRecorder()
+			if i == 0 {
+				api.increaseBrightness(w, req)
+			} else {
+				api.decreaseBrightness(w, req)
+			}
+			if w.Result().StatusCode != http.StatusInternalServerError {
+				t.Errorf("Expected requests to be rejected: %v", w.Result().StatusCode)
+			}
+		}
+	})
+}

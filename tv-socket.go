@@ -51,7 +51,7 @@ func (s *socket) connect() error {
 
 	conn, _, err := dialer.Dial(wsUrl, nil)
 	if err != nil {
-		return fmt.Errorf("could not connect to address: %w", err)
+		return fmt.Errorf("could not connect to tv: %w", err)
 	}
 
 	connChn := make(chan error, 1)
