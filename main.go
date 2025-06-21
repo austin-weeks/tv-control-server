@@ -7,41 +7,25 @@ import (
 	"net/http"
 	"os"
 	"strings"
-
-	"github.com/joho/godotenv"
-)
-
-const (
-	TV_PORT    = "8002"
-	TOKEN_FILE = ".tv_token"
-	APP_PORT   = ":1234"
 )
 
 var isTesting bool
 
 func main() {
-	err := godotenv.Load(".env")
+	config, err := getConfig()
 	if err != nil {
-		fmt.Println("Warning: no .env file found.")
+		log.Fatal(err)
 	}
-	TV_IP := os.Getenv("TV_IP")
-	if TV_IP == "" {
-		log.Fatal("TV_IP environment variable is not set.")
-	}
-	CLIENT_PW := os.Getenv("CLIENT_PW")
-	if CLIENT_PW == "" {
-		fmt.Println("Warning: CLIENT_PW environment variable is not set. Gopher Remote will not reject unauthorized requests.")
-	}
-	APP_NAME := base64.StdEncoding.EncodeToString([]byte("Gopher Remote"))
+	APP_NAME := base64.StdEncoding.EncodeToString([]byte(config.AppName))
 
 	token := ""
-	if data, err := os.ReadFile(TOKEN_FILE); err == nil {
+	if data, err := os.ReadFile(config.TokenFile); err == nil {
 		token = strings.TrimSpace(string(data))
 	}
 
 	socket := socket{
-		ip:      TV_IP,
-		port:    TV_PORT,
+		ip:      config.TvIP,
+		port:    config.TvPort,
 		appName: APP_NAME,
 		token:   token,
 	}
@@ -49,14 +33,14 @@ func main() {
 
 	api := api{
 		socket: &socket,
-		pw:     CLIENT_PW,
+		pw:     config.ClientPassword,
 	}
 
 	http.HandleFunc("/increase-brightness", api.increaseBrightness)
 	http.HandleFunc("/decrease-brightness", api.decreaseBrightness)
 
-	fmt.Printf("Running  Gopher Remote on port %s\n", APP_PORT[1:])
-	err = http.ListenAndServe(APP_PORT, nil)
+	fmt.Printf(" Running %s on port %s\n", config.AppName, config.AppPort)
+	err = http.ListenAndServe(":"+config.AppPort, nil)
 
 	if err != nil {
 		log.Fatal(err)

@@ -1,4 +1,5 @@
 .env
 .tv_token
+config.json
 dist
 *.out
