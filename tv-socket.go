@@ -27,8 +27,6 @@ type socket struct {
 	tokenFile  string
 }
 
-const DEFAULT_TOKEN_FILE = ".tv_token"
-
 func (s *socket) connect() error {
 	if s.connection != nil {
 		return nil

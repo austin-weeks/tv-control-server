@@ -9,13 +9,31 @@ For pre-built binaries, see [Releases](/releases).
 
 Otherwise, build from source with the [Go toolchain](https://go.dev/).
 
-## Usage
-You must set an enviroment variable for your TV's IP address and optionally, a client password. Variables will be read from a `.env` file if present.
 
-```shell
-TV_IP="127.0.0.1" # Your Samsung TV's IP Address
-CLIENT_PW="password" # an optional password to authenticate with your server
+## Usage
+
+### Configuration
+
+App settings must be provided in a `config.json` file.
+- `tv_ip` - ***required*** - IP address of your TV
+- `app_name` - Name of the app as displayed on your TV - *default: Gopher Remote*
+- `app_port` - Port to run the server - *default: 1234*
+- `token_file` - Storage location of generated tv authentication token - *default: .tv_token*
+- `tv_port` - Port of your TV (8002 for Samsung TV's) - *default: 8002*
+- `client_password` - Optional password required to authenticate with app - *default: none*
+- `brightness_location` - Location of brightness settings in your TV's quick menu - *default: 3*
+```json
+{
+    "tv_ip": "127.0.0.1", // required
+    "app_name": "My Remote",
+    "app_port": "5173",
+    "token_file": "token.txt",
+    "tv_port": "8002",
+    "client_password": "password123",
+    "brightness_location": 1
+}
 ```
+
 
 ### Endpoints
 
