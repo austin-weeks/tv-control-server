@@ -8,19 +8,28 @@ import (
 func TestGetOpenMacro(t *testing.T) {
 	t.Run("Correct with location <= 1", func(t *testing.T) {
 		for _, loc := range []int{-1, 0, 1} {
-			openMacros := getOpenMacros(loc)
+			openMacros := getOpenMacros(loc, 1)
 			if len(openMacros) != 3 {
 				t.Error("Expected macros to have length of 3:", openMacros)
 			}
 		}
 	})
+
 	t.Run("Correct with location > 1", func(t *testing.T) {
 		for _, loc := range []int{2, 3, 4} {
-			openMacros := getOpenMacros(loc)
+			openMacros := getOpenMacros(loc, 1)
 			expectedLen := 3 + (loc - 1)
 			if len(openMacros) != expectedLen {
 				t.Errorf("Expected macros to have length of %d: %v", expectedLen, openMacros)
 			}
+		}
+	})
+
+	t.Run("Correct initial delay", func(t *testing.T) {
+		initialDelay := 5*time.Second + 3*time.Millisecond
+		openMacros := getOpenMacros(1, initialDelay)
+		if openMacros[0].delay != initialDelay {
+			t.Errorf("Expected delay of %d != actual delay of %d", initialDelay, openMacros[0].delay)
 		}
 	})
 }
@@ -75,14 +84,14 @@ func TestChangeBrightnes(t *testing.T) {
 			},
 		}
 		brightLoc := 1
-		expectedMacros := append(append(getOpenMacros(brightLoc), changeMacros...), CLOSE_MACRO...)
+		expectedMacros := append(append(getOpenMacros(brightLoc, 1), changeMacros...), CLOSE_MACRO...)
 		close := startTestWSServer(t, "", expectedMacros)
 		defer close()
 		socket, err := getTestSocket()
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = changeBrightness(&socket, 3, brightLoc, KEY_RIGHT)
+		err = changeBrightness(&socket, 3, brightLoc, 1, KEY_RIGHT)
 		if err != nil {
 			t.Error("Error changing brightness:", err)
 		}
