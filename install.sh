@@ -1,5 +1,5 @@
 #!/bin/sh
-# Usage: curl -fsSL https://github.com/austin-weeks/tv-control-server/install.sh | sh
+# Usage: curl -fsSL https://raw.githubusercontent.com/austin-weeks/tv-control-server/main/install.sh | sh
 
 REPO="austin-weeks/tv-control-server"
 NAME="tv-control"

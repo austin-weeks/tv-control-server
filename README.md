@@ -7,7 +7,7 @@ A server that provides endpoints for controlling your Samsung TV without needing
 ## Installation
 Run the install script to download the latest version for your OS.
 ```bash
-curl -fsSL https://github.com/austin-weeks/tv-control-server/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/austin-weeks/tv-control-server/main/install.sh | sh
 ```
 
 To install an older pre-built binary, see [Releases](/releases).
