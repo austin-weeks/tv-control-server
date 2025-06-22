@@ -5,6 +5,26 @@ import (
 	"time"
 )
 
+func TestGetOpenMacro(t *testing.T) {
+	t.Run("Correct with location <= 1", func(t *testing.T) {
+		for _, loc := range []int{-1, 0, 1} {
+			openMacros := getOpenMacros(loc)
+			if len(openMacros) != 3 {
+				t.Error("Expected macros to have length of 3:", openMacros)
+			}
+		}
+	})
+	t.Run("Correct with location > 1", func(t *testing.T) {
+		for _, loc := range []int{2, 3, 4} {
+			openMacros := getOpenMacros(loc)
+			expectedLen := 3 + (loc - 1)
+			if len(openMacros) != expectedLen {
+				t.Errorf("Expected macros to have length of %d: %v", expectedLen, openMacros)
+			}
+		}
+	})
+}
+
 func TestPerformMacro(t *testing.T) {
 	t.Run("Macro sent correctly", func(t *testing.T) {
 		macros := []macro{
@@ -54,14 +74,15 @@ func TestChangeBrightnes(t *testing.T) {
 				delay: 1 * time.Millisecond,
 			},
 		}
-		expectedMacros := append(append(OPEN_MACRO, changeMacros...), CLOSE_MACRO...)
+		brightLoc := 1
+		expectedMacros := append(append(getOpenMacros(brightLoc), changeMacros...), CLOSE_MACRO...)
 		close := startTestWSServer(t, "", expectedMacros)
 		defer close()
 		socket, err := getTestSocket()
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = changeBrightness(&socket, 3, KEY_RIGHT)
+		err = changeBrightness(&socket, 3, brightLoc, KEY_RIGHT)
 		if err != nil {
 			t.Error("Error changing brightness:", err)
 		}

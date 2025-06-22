@@ -22,21 +22,6 @@ type keyMsgParams struct {
 	TypeOfRemote string `json:"TypeOfRemote"`
 }
 
-var OPEN_MACRO = []macro{
-	{
-		key:   KEY_MORE,
-		delay: 2000 * time.Millisecond,
-	},
-	{
-		key:   KEY_ENTER,
-		delay: 1000 * time.Millisecond,
-	},
-	{
-		key:   KEY_ENTER,
-		delay: 1000 * time.Millisecond,
-	},
-}
-
 var CLOSE_MACRO = []macro{
 	{
 		key:   KEY_RETURN,
@@ -50,6 +35,27 @@ var CLOSE_MACRO = []macro{
 		key:   KEY_RETURN,
 		delay: 1300 * time.Millisecond,
 	},
+}
+
+func getOpenMacros(brightnessPosition int) []macro {
+	openMacros := []macro{{
+		key:   KEY_MORE,
+		delay: 2000 * time.Millisecond,
+	}, {
+		key:   KEY_ENTER,
+		delay: 1000 * time.Millisecond,
+	}}
+	for i := 0; i < brightnessPosition-1; i++ {
+		openMacros = append(openMacros, macro{
+			key:   KEY_RIGHT,
+			delay: 500 * time.Millisecond,
+		})
+	}
+	openMacros = append(openMacros, macro{
+		key:   KEY_ENTER,
+		delay: 1000 * time.Millisecond,
+	})
+	return openMacros
 }
 
 func sendKey(conn *websocket.Conn, key string) error {
@@ -81,13 +87,14 @@ func performMacro(conn *websocket.Conn, macros []macro) error {
 	return nil
 }
 
-func changeBrightness(socket *socket, change int, key string) error {
+func changeBrightness(socket *socket, change int, brightnessPosition int, key string) error {
 	err := socket.connect()
 	if err != nil {
 		return err
 	}
 
-	err = performMacro(socket.connection, OPEN_MACRO)
+	openMacros := getOpenMacros(brightnessPosition)
+	err = performMacro(socket.connection, openMacros)
 	if err != nil {
 		return err
 	}
