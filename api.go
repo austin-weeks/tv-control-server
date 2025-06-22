@@ -5,12 +5,14 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type api struct {
 	socket             *socket
 	pw                 string
 	brightnessPosition int
+	initialDelay       time.Duration
 }
 
 const MAX_CHANGE = 50
@@ -54,7 +56,7 @@ func (a *api) increaseBrightness(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	err = changeBrightness(a.socket, change, a.brightnessPosition, KEY_RIGHT)
+	err = changeBrightness(a.socket, change, a.brightnessPosition, a.initialDelay, KEY_RIGHT)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
@@ -71,7 +73,7 @@ func (a *api) decreaseBrightness(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	err = changeBrightness(a.socket, change, a.brightnessPosition, KEY_LEFT)
+	err = changeBrightness(a.socket, change, a.brightnessPosition, a.initialDelay, KEY_LEFT)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {

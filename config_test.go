@@ -25,7 +25,8 @@ func TestGetConfig(t *testing.T) {
 			"tv_port": "test-tv-port",
 			"tv_ip": "test-tv-ip",
 			"client_password": "test-client-password",
-			"brightness_location": 1
+			"brightness_location": 1,
+			"initial_delay_ms": 2000
 		}`), 0644)
 		if err != nil {
 			panic(err)
@@ -40,7 +41,8 @@ func TestGetConfig(t *testing.T) {
 			config.TvPort != "test-tv-port" ||
 			config.TvIP != "test-tv-ip" ||
 			config.ClientPassword != "test-client-password" ||
-			config.BrightnessLocation != 1 {
+			config.BrightnessLocation != 1 ||
+			config.InitialDelay != 2000 {
 			t.Errorf("Config, %v, does not contain expected values", config)
 		}
 	})
@@ -83,7 +85,8 @@ func TestGetConfig(t *testing.T) {
 			config.TvPort != DEFAULT_TV_PORT ||
 			config.TokenFile != DEFAULT_TOKEN_FILE ||
 			config.ClientPassword != "" ||
-			config.BrightnessLocation != DEFAULT_BRIGHT_LOC {
+			config.BrightnessLocation != DEFAULT_BRIGHT_LOC ||
+			config.InitialDelay != DEFAULT_INITIAL_DELAY {
 			t.Errorf("Config, %v, does not contain default values", config)
 		}
 	})

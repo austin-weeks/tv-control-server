@@ -22,18 +22,19 @@ App settings must be provided in a `config.json` file.
 - `tv_port` - Port of your TV (8002 for Samsung TV's) - *default: 8002*
 - `client_password` - Optional password required to authenticate with app - *default: none*
 - `brightness_location` - Location of brightness settings in your TV's quick menu - *default: 3*
+- `initial_delay_ms` - Delay in ms to wait after connecting to TV to send commands. Useful for TVs with a laggy UI - *default: 2000*
 ```json
 {
-    "tv_ip": "127.0.0.1", // required
+    "tv_ip": "127.0.0.1",
     "app_name": "My Remote",
     "app_port": "5173",
     "token_file": "token.txt",
     "tv_port": "8002",
     "client_password": "password123",
-    "brightness_location": 1
+    "brightness_location": 1,
+    "initial_delay_ms": 4000
 }
 ```
-
 
 ### Endpoints
 

@@ -37,10 +37,10 @@ var CLOSE_MACRO = []macro{
 	},
 }
 
-func getOpenMacros(brightnessPosition int) []macro {
+func getOpenMacros(brightnessPosition int, initialDelay time.Duration) []macro {
 	openMacros := []macro{{
 		key:   KEY_MORE,
-		delay: 2000 * time.Millisecond,
+		delay: initialDelay,
 	}, {
 		key:   KEY_ENTER,
 		delay: 1000 * time.Millisecond,
@@ -87,13 +87,13 @@ func performMacro(conn *websocket.Conn, macros []macro) error {
 	return nil
 }
 
-func changeBrightness(socket *socket, change int, brightnessPosition int, key string) error {
+func changeBrightness(socket *socket, change int, brightnessPosition int, initialDelay time.Duration, key string) error {
 	err := socket.connect()
 	if err != nil {
 		return err
 	}
 
-	openMacros := getOpenMacros(brightnessPosition)
+	openMacros := getOpenMacros(brightnessPosition, initialDelay)
 	err = performMacro(socket.connection, openMacros)
 	if err != nil {
 		return err

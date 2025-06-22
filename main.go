@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 var isTesting bool
@@ -35,6 +36,7 @@ func main() {
 		socket:             &socket,
 		pw:                 config.ClientPassword,
 		brightnessPosition: config.BrightnessLocation,
+		initialDelay:       time.Duration(config.InitialDelay) * time.Millisecond,
 	}
 
 	http.HandleFunc("/increase-brightness", api.increaseBrightness)
@@ -42,8 +44,5 @@ func main() {
 
 	fmt.Printf(" Running %s on port %s\n", config.AppName, config.AppPort)
 	err = http.ListenAndServe(":"+config.AppPort, nil)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Fatal(err)
 }
