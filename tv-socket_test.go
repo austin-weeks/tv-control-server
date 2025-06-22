@@ -69,7 +69,7 @@ func TestConnect(t *testing.T) {
 		defer close()
 		socket := socket{
 			ip:   "bad ip",
-			port: "bad port",
+			port: 2,
 		}
 		err := socket.connect()
 		if err == nil {

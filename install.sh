@@ -69,9 +69,9 @@ if [ ! -f "$CONFIG_FILE" ]; then
 {
     "tv_ip": "",
     "app_name": "Gopher Remote",
-    "app_port": "1234",
+    "app_port": 1234,
     "token_file": ".tv_token",
-    "tv_port": "8002",
+    "tv_port": 8002,
     "client_password": "",
     "brightness_location": 3,
     "initial_delay_ms": 2000

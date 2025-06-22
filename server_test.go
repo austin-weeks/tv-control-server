@@ -11,7 +11,7 @@ import (
 )
 
 const TEST_IP = "127.0.0.1"
-const TEST_PORT = "12345"
+const TEST_PORT = 12345
 const TEST_TOKEN = "test-token"
 
 func getTestSocket() (socket, error) {
@@ -84,7 +84,7 @@ func startTestWSServer(t *testing.T, token string, expectedMacros []macro) func(
 		},
 	)
 
-	ln, err := net.Listen("tcp", fmt.Sprintf("%s:%s", TEST_IP, TEST_PORT))
+	ln, err := net.Listen("tcp", fmt.Sprintf("%s:%d", TEST_IP, TEST_PORT))
 	if err != nil {
 		t.Fatalf("Failed to listen: %v", err)
 	}
