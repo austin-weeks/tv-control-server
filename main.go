@@ -32,8 +32,9 @@ func main() {
 	defer socket.close()
 
 	api := api{
-		socket: &socket,
-		pw:     config.ClientPassword,
+		socket:             &socket,
+		pw:                 config.ClientPassword,
+		brightnessPosition: config.BrightnessLocation,
 	}
 
 	http.HandleFunc("/increase-brightness", api.increaseBrightness)
