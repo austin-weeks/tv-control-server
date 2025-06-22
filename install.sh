@@ -34,15 +34,26 @@ else
 fi
 
 # Get latest release tag
-TAG=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name"' | head -1 | sed -E 's/.*: "([^"]+)".*/\1/
-')
+TAG=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name"' | head -1 | sed -E 's/.*: "([^"]+)".*/\1/')
 if [ -z "$TAG" ]; then
   echo "Could not find latest release tag."; exit 1
 fi
 
+# Prompt user for confirmation before downloading
+printf "\n${CYAN}Latest release is tag $TAG${NC}\n"
+if [ -f "$OUT" ]; then
+  printf "${YELLOW}Warning: $OUT already exists and will be replaced with the latest version if you proceed.${NC}\n"
+fi
+printf "${CYAN}Proceed with download? [Y/n]: ${NC}"
+read -r CONFIRM
+if [ "$CONFIRM" != "" ] && [ "$CONFIRM" != "y" ] && [ "$CONFIRM" != "Y" ]; then
+  echo "Installation cancelled."
+  exit 0
+fi
+
 # Download binary
 URL="https://github.com/$REPO/releases/download/$TAG/$NAME-$OS-$ARCH${OUT##$NAME}"
-printf "${CYAN}Downloading tag $TAG at $URL ...${NC}\n\n"
+printf "\n${CYAN}Downloading tag $TAG at $URL ...${NC}\n\n"
 curl -fL --progress-bar "$URL" -o "$OUT"
 if [ $? -ne 0 ]; then
   echo "Download failed. Please check the URL or your network connection."
