@@ -20,7 +20,7 @@ type tvResponseData struct {
 
 type socket struct {
 	ip         string
-	port       string
+	port       int
 	appName    string
 	token      string
 	connection *websocket.Conn
@@ -37,7 +37,7 @@ func (s *socket) connect() error {
 		protocol = "ws"
 	}
 	wsUrl := fmt.Sprintf(
-		"%s://%s:%s/api/v2/channels/samsung.remote.control?name=%s",
+		"%s://%s:%d/api/v2/channels/samsung.remote.control?name=%s",
 		protocol, s.ip, s.port, s.appName,
 	)
 	if s.token != "" {

@@ -20,9 +20,9 @@ func TestGetConfig(t *testing.T) {
 		clearConfigFile()
 		err := os.WriteFile(configPath, []byte(`{
 			"app_name": "test-name",
-			"app_port": "test-app-port",
+			"app_port": 1001,
 			"token_file": "test-token-file",
-			"tv_port": "test-tv-port",
+			"tv_port": 1002,
 			"tv_ip": "test-tv-ip",
 			"client_password": "test-client-password",
 			"brightness_location": 1,
@@ -36,9 +36,9 @@ func TestGetConfig(t *testing.T) {
 			t.Fatal("Failed to get config:", err)
 		}
 		if config.AppName != "test-name" ||
-			config.AppPort != "test-app-port" ||
+			config.AppPort != 1001 ||
 			config.TokenFile != "test-token-file" ||
-			config.TvPort != "test-tv-port" ||
+			config.TvPort != 1002 ||
 			config.TvIP != "test-tv-ip" ||
 			config.ClientPassword != "test-client-password" ||
 			config.BrightnessLocation != 1 ||

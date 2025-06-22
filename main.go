@@ -42,7 +42,7 @@ func main() {
 	http.HandleFunc("/increase-brightness", api.increaseBrightness)
 	http.HandleFunc("/decrease-brightness", api.decreaseBrightness)
 
-	fmt.Printf(" Running %s on port %s\n", config.AppName, config.AppPort)
-	err = http.ListenAndServe(":"+config.AppPort, nil)
+	fmt.Printf(" Running %s on port %d\n", config.AppName, config.AppPort)
+	err = http.ListenAndServe(fmt.Sprintf(":%d", config.AppPort), nil)
 	log.Fatal(err)
 }
