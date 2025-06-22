@@ -5,10 +5,14 @@
 A server that provides endpoints for controlling your Samsung TV without needing to reach for your remote. Currently, endpoints for increasing and decreasing brightness are provided.
 
 ## Installation
-For pre-built binaries, see [Releases](/releases).
+Run the install script to download the latest version for your OS.
+```bash
+curl -fsSL https://github.com/austin-weeks/tv-control-server/install.sh | sh
+```
+
+To install an older pre-built binary, see [Releases](/releases).
 
 Otherwise, build from source with the [Go toolchain](https://go.dev/).
-
 
 ## Usage
 
